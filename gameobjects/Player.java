@@ -20,7 +20,7 @@ public class Player extends GameObject {
 	private static float ACCEL = 1/500f;
 	private static float BRAKE = 1/50f;
 	private static float MAX_VELOCITY = 3/4f;
-	private static float FRICTION = 1/3000f;
+	private static float FRICTION = 1/6000f;
 	private static float INIT_ANGLE = 0;
 	
 	/* Variables */
