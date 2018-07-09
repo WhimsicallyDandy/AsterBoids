@@ -25,11 +25,11 @@ public class Player extends GameObject {
 	
 	/* Variables */
 	
-	
 	/* CONSTRUCTORS */
 	
 	public Player(float x, float y) throws SlickException {
 		super(x, y, SPEED_ROTATE, S_PLAYER);
+		
 		setVelAngle(INIT_ANGLE);
 		setSpriteAngle(INIT_ANGLE);
 	}
@@ -110,7 +110,7 @@ public class Player extends GameObject {
 		turnObject(right, delta);
 		rotateSprite(right, delta);
 	}
-	private void addVectors(float mag1, float arc1, float mag2, float mag2) {
+	private void addVectors(float mag1, float arc1, float mag2, float arc2) {
 		
 	}
 	

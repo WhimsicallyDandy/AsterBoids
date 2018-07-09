@@ -1,8 +1,8 @@
 package gameobjects;
 
 import backend.GameApp;
-import util.Position;
-import util.Hitbox;
+import util.*;
+
 
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
@@ -27,20 +27,13 @@ public class GameObject {
 	private Position position;
 	private Image sprite;
 	private Hitbox hitbox;
+	private Vector velocity;
+	private Vector accel;
 	
 	private float spriteRotationSpeed;
 	private float objectRotationSpeed;
 	private float spriteAngle;
-	
-	private float velocity;
-	private float velAngle;
-	
-	private float xAccel;
-	private float yAccel;
-	
-	private float xSpeed;
-	private float ySpeed;
-	
+	private float objectAngle;
 	
 	private boolean canRender = true;
 	private boolean canMove = true;
@@ -52,13 +45,15 @@ public class GameObject {
 		sprite = new Image(S_DEFAULT);
 		hitbox = new Hitbox(position, sprite);
 	}
-	public GameObject(float x, float y, float rotationSpeed, String imgsrc ) throws SlickException {
+	public GameObject(float x, float y, float rotationSpeed, String imgsrc) throws SlickException {
 		position = new Position(x, y);
 		spriteRotationSpeed = rotationSpeed;
 		objectRotationSpeed = rotationSpeed;
 		sprite = new Image(imgsrc);
 		hitbox = new Hitbox(position, sprite);
 		spriteAngle = sprite.getRotation();
+		velocity = new Vector(0, 0);
+		accel = new Vector(0, 0);
 	}
 	
 	/* METHODS */
@@ -72,7 +67,7 @@ public class GameObject {
 		if (canMove) {move(input, delta);}
 		hitbox.setPos(position);
 		// keeps angle within 360 at all times
-		spriteAngle = (spriteAngle<0)?spriteAngle+DEGREES_360:spriteAngle%DEGREES_360;
+		spriteAngle = clamp360(spriteAngle);
 		sprite.setRotation(spriteAngle);
 		
 	}
@@ -86,8 +81,20 @@ public class GameObject {
 	
 	/* Helper Methods */
 	// moves the object. currently blank, for abstraction reasons
-
 	public void move(Input input, int delta) {}
+	
+	// moves the object by its velocity
+	public void travel() {
+		velocity.addVector(accel);
+		addX(velocity.getXVec());
+		addY(velocity.getYVec());
+	}
+	
+	// clamps within 360
+	private float clamp360(float a) {
+		while (a<0) {a+=360;}
+		return a%360;
+	}
 	
 	// slick is weird with angles
 	public void turnObject(boolean right) {
@@ -155,23 +162,23 @@ public class GameObject {
 		this.spriteAngle += angle;
 	}
 	public void setVelAngle(float angle) {
-		velAngle = angle;
+		objectAngle=angle;
 	}
 	public void addVelAngle(float angle) {
-		velAngle += angle;
+		objectAngle+=angle;
 	}
-	public void setVelocity(float v) {
-		velocity = v;
+	public void setVelocity(Vector v) {
+		velocity = new Vector(v);
 	}
-	public void accelerate(float v) {
-		velocity += v;
+	public void accelerate(Vector v) {
+		velocity.addVector(v);
 	}
 	
 	public void setXSpeed(float x) {
-		xSpeed = x;
+		velocity.setXVec(x);
 	}
 	public void setYSpeed(float y) {
-		ySpeed = y;
+		velocity.setYVec(y);
 	}
 	
 	public void setSpriteRotationSpeed(float rotationSpeed) {
@@ -179,28 +186,20 @@ public class GameObject {
 	}
 	
 	/* Getters */
-	public Position getPos() {
-		return position;
-	}
-	public float getX() {
-		return position.getX();
-	}
-	public float getY() {
-		return position.getY();
-	}
+	public Position getPos() {return position;}
+	
+	public float getX() {return position.getX();}
+	public float getY() {return position.getY();}
+	
 	public float getSpriteAngle() {return spriteAngle;}
 	
-	// returns the absolute value of the directional velocity
-	public float getVelocity() {return velocity;}
-	// (float)Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2))
+	public float getXSpeed() {return velocity.getXVec();}
+	public float getYSpeed() {return velocity.getYVec();}
 	
-	public float getXSpeed() {
-		return xSpeed;
-	}
-	public float getYSpeed() {
-		return ySpeed;
-	}
-	public float getVelocityAngle() {return velAngle;}
+	public float getVelocityAngle() {return velocity.getAngle();}
+	// returns the absolute value of the directional velocity
+	public Vector getVelocity() {return new Vector(velocity);}
+	// (float)Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2))
 	/*
 	public float getXspeed() {
 		return (float)Math.cos((velAngle-DEGREE_OFFSET)*Math.PI/180)*velocity;
