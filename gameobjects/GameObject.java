@@ -27,10 +27,21 @@ public class GameObject {
 	private Position position;
 	private Image sprite;
 	private Hitbox hitbox;
-	private float rotSpeed;
-	private float angle;
+	
+	private float spriteRotationSpeed;
+	private float objectRotationSpeed;
+	private float spriteAngle;
+	
 	private float velocity;
 	private float velAngle;
+	
+	private float xAccel;
+	private float yAccel;
+	
+	private float xSpeed;
+	private float ySpeed;
+	
+	
 	private boolean canRender = true;
 	private boolean canMove = true;
 	private boolean canRotate = true;
@@ -41,12 +52,13 @@ public class GameObject {
 		sprite = new Image(S_DEFAULT);
 		hitbox = new Hitbox(position, sprite);
 	}
-	public GameObject(float x, float y, float rotSpeed, String imgsrc ) throws SlickException {
+	public GameObject(float x, float y, float rotationSpeed, String imgsrc ) throws SlickException {
 		position = new Position(x, y);
-		this.rotSpeed = rotSpeed;
+		spriteRotationSpeed = rotationSpeed;
+		objectRotationSpeed = rotationSpeed;
 		sprite = new Image(imgsrc);
 		hitbox = new Hitbox(position, sprite);
-		angle = sprite.getRotation();
+		spriteAngle = sprite.getRotation();
 	}
 	
 	/* METHODS */
@@ -60,8 +72,8 @@ public class GameObject {
 		if (canMove) {move(input, delta);}
 		hitbox.setPos(position);
 		// keeps angle within 360 at all times
-		angle = (angle<0)?angle+DEGREES_360:angle%DEGREES_360;
-		sprite.setRotation(angle);
+		spriteAngle = (spriteAngle<0)?spriteAngle+DEGREES_360:spriteAngle%DEGREES_360;
+		sprite.setRotation(spriteAngle);
 		
 	}
 	
@@ -73,15 +85,46 @@ public class GameObject {
 	}
 	
 	/* Helper Methods */
+	// moves the object. currently blank, for abstraction reasons
+
 	public void move(Input input, int delta) {}
 	
 	// slick is weird with angles
-	public void rotate(boolean right) {
+	public void turnObject(boolean right) {
 		if (canRotate) {
 			if (right) {
-				addAngle(rotSpeed);
+				addVelAngle(objectRotationSpeed);
 			} else {
-				addAngle(-rotSpeed);
+				addVelAngle(-objectRotationSpeed);
+			}
+		}
+	}
+	public void turnObject(boolean right, int delta) {
+		if (canRotate) {
+			if (right) {
+				addVelAngle(objectRotationSpeed*delta/GameApp.DELTA);
+			} else {
+				addVelAngle(-objectRotationSpeed*delta/GameApp.DELTA);
+			}
+		}
+	}
+	
+	// rotates the sprite
+	public void rotateSprite(boolean direction) {
+		if (canRotate) {
+			if (direction) {
+				addSpriteAngle(-spriteRotationSpeed);
+			} else {
+				addSpriteAngle(spriteRotationSpeed);
+			}
+		}
+	}
+	public void rotateSprite(boolean direction, int delta) {
+		if (canRotate) {
+			if (direction) {
+				addSpriteAngle(-spriteRotationSpeed*delta/GameApp.DELTA);
+			} else {
+				addSpriteAngle(spriteRotationSpeed*delta/GameApp.DELTA);
 			}
 		}
 	}
@@ -105,11 +148,11 @@ public class GameObject {
 	public void addY(float y) {
 		position.addY(y);
 	}
-	public void setAngle(float angle) {
-		this.angle = angle;
+	public void setSpriteAngle(float angle) {
+		this.spriteAngle = angle;
 	}
-	public void addAngle(float angle) {
-		this.angle += angle;
+	public void addSpriteAngle(float angle) {
+		this.spriteAngle += angle;
 	}
 	public void setVelAngle(float angle) {
 		velAngle = angle;
@@ -120,22 +163,19 @@ public class GameObject {
 	public void setVelocity(float v) {
 		velocity = v;
 	}
-	public void addVelocity(float v) {
+	public void accelerate(float v) {
 		velocity += v;
 	}
-	// rotate but with delta inclusion
-	public void rotate(boolean direction, int delta) {
-		if (canRotate) {
-			if (direction) {
-				addAngle(-rotSpeed*delta/GameApp.DELTA);
-			} else {
-				addAngle(rotSpeed*delta/GameApp.DELTA);
-			}
-		}
-		//this.angle += angle*delta;
+	
+	public void setXSpeed(float x) {
+		xSpeed = x;
 	}
-	public void setRotationSpeed(float rotationSpeed) {
-		rotSpeed = rotationSpeed;
+	public void setYSpeed(float y) {
+		ySpeed = y;
+	}
+	
+	public void setSpriteRotationSpeed(float rotationSpeed) {
+		this.spriteRotationSpeed = rotationSpeed;
 	}
 	
 	/* Getters */
@@ -148,20 +188,25 @@ public class GameObject {
 	public float getY() {
 		return position.getY();
 	}
-	public float getAngle() {return angle;}
-	public float getVelocity() {return velocity;}
+	public float getSpriteAngle() {return spriteAngle;}
 	
-	public float getHorizontalVelocity() {
+	// returns the absolute value of the directional velocity
+	public float getVelocity() {return velocity;}
+	// (float)Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2))
+	
+	public float getXSpeed() {
+		return xSpeed;
+	}
+	public float getYSpeed() {
+		return ySpeed;
+	}
+	public float getVelocityAngle() {return velAngle;}
+	/*
+	public float getXspeed() {
 		return (float)Math.cos((velAngle-DEGREE_OFFSET)*Math.PI/180)*velocity;
 	}
 	public float getVerticalVelocity() {
 		return (float)Math.sin((velAngle-DEGREE_OFFSET)*Math.PI/180)*velocity;
 	}
-	
-	public float getHorizontalRatio() {
-		return (float)Math.cos((angle-DEGREE_OFFSET)*Math.PI/180);
-	}
-	public float getVerticalRatio() {
-		return (float)Math.sin((angle-DEGREE_OFFSET)*Math.PI/180);
-	}
+	*/
 }

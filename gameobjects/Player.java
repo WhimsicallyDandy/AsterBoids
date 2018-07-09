@@ -19,8 +19,8 @@ public class Player extends GameObject {
 	private static float SPEED_ROTATE = (float) (1000.0/2f);
 	private static float ACCEL = 1/500f;
 	private static float BRAKE = 1/50f;
-	private static float MAX_VELOCITY = 3/4f;
-	private static float FRICTION = 1/6000f;
+	private static float MAX_VELOCITY = 2/4f;
+	private static float FRICTION = 1/1000f;
 	private static float INIT_ANGLE = 0;
 	
 	/* Variables */
@@ -30,7 +30,8 @@ public class Player extends GameObject {
 	
 	public Player(float x, float y) throws SlickException {
 		super(x, y, SPEED_ROTATE, S_PLAYER);
-		setVelAngle(getAngle());
+		setVelAngle(INIT_ANGLE);
+		setSpriteAngle(INIT_ANGLE);
 	}
 	
 	/* METHODS */
@@ -41,31 +42,32 @@ public class Player extends GameObject {
 	
 	// false left, true right. might be better with enums in the future
 	public void move(Input input, int delta) {
+		
 		// rotate ship with left and right
 		if (input.isKeyDown(Input.KEY_LEFT)) {
-			rotate(true, delta);
+			turnShip(true, delta);
 		}			
 		if (input.isKeyDown(Input.KEY_RIGHT))  {
-			rotate(false, delta);
+			turnShip(false, delta);
 		}			
 		// if activated, move ship forward, limit max speed
 		if (input.isKeyDown(Input.KEY_UP)) {
-			addVelocity(delta*ACCEL);
+			accelerate(delta*ACCEL);
 		// else, slow it down until it stops.
 		} else {
-			addVelocity(-delta*FRICTION);
+			accelerate(-delta*FRICTION);
 		}
 		// hit the brakes!!!
 		if (input.isKeyDown(Input.KEY_DOWN)) {
-			addVelocity(-delta*BRAKE);
+			accelerate(-delta*BRAKE);
 			
 		}
 		
 		clampVelocity();
 		correctMovement(input);
 		
-		addX(delta*getHorizontalVelocity());
-		addY(delta*getVerticalVelocity());
+		addX(delta*getXSpeed());
+		addY(delta*getYSpeed());
 	}
 	
 	/* Helper Methods */
@@ -79,21 +81,40 @@ public class Player extends GameObject {
 	/** debugging, corrects and sets positions accordingly */
 	private void correctMovement(Input input) {
 		if (input.isKeyDown(Input.KEY_A)) {
-			setAngle(270);
+			setVelAngle(270);
+			setSpriteAngle(270);
 		}
 		if (input.isKeyPressed(Input.KEY_D)) {
-			setAngle(90);
+			setVelAngle(90);
+			setSpriteAngle(90);
 		}
 	}
 	
 	/** makes sure velocity is within bounds */
 	private void clampVelocity() {
+		//calcVelocity();
 		// makes sure velocity isn't below 0 (no going backwards)
 		if (getVelocity()<0) {setVelocity(0);}
 		// makes sure velocity isn't above top speed (what about boosts?)
 		if (getVelocity()>MAX_VELOCITY) {setVelocity(MAX_VELOCITY);}
 		
+		// assigns velocity to x and y axes
+		setYSpeed((float)-Math.sin((getVelocityAngle()-DEGREE_OFFSET)*Math.PI/180)*getVelocity());
+		setXSpeed((float)-Math.cos((getVelocityAngle()-DEGREE_OFFSET)*Math.PI/180)*getVelocity());
 	}
+	private void calcVelocity() {
+		setVelocity((float)Math.sqrt(Math.pow(getXSpeed(), 2) + Math.pow(getYSpeed(), 2)));
+	}
+	
+	private void turnShip(boolean right, int delta) {
+		turnObject(right, delta);
+		rotateSprite(right, delta);
+	}
+	private void addVectors(float mag1, float arc1, float mag2, float mag2) {
+		
+	}
+	
+	
 	
 	/* Setters */
 	
