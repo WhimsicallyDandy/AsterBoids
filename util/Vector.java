@@ -82,6 +82,21 @@ public class Vector {
 	public void setMagnitude(float m) {magnitude = m;}
 	public void addMagnitude(float m) {magnitude += m;}
 	
+	public void setAngle(float a) {angle = clamp360(a);}
+	public void addAngle(float a) {
+		angle += a;
+		angle = clamp360(angle);
+	}
+	
+	public void setVector(Vector v) {
+		setMagnitude(v.getMagnitude());
+		setAngle(v.getAngle());
+	}
+	public void setVector(float m, float a) {
+		setMagnitude(m);
+		setAngle(a);
+	}
+	
 	public void setXVec(float x) {
 		// creates a new vector of just the x component, and subtracts it from the vector
 		addVector(new Vector(getXVec(), (angle<=180)?270:90));
@@ -94,10 +109,6 @@ public class Vector {
 		addVector(new Vector(y, (Math.signum(y)>0)?180:0));
 	}
 	
-	public void setAngle(float a) {angle = clamp360(a);}
-	public void addAngle(float a) {
-		angle += a;
-		angle = clamp360(angle);
-	}
+	
 	
 }

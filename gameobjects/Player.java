@@ -17,7 +17,7 @@ public class Player extends GameObject {
 	private static String S_PLAYER = "res/spaceship.png";
 	private static float SPEED_DUMMY_PLAYER = 1/2f;
 	private static float SPEED_ROTATE = (float) (1000.0/2f);
-	private static float ACCEL = 1/500f;
+	private static float ACCEL = 1/50f;
 	private static float BRAKE = 1/50f;
 	private static float MAX_VELOCITY = 2/4f;
 	private static float FRICTION = 1/1000f;
@@ -52,20 +52,20 @@ public class Player extends GameObject {
 		}			
 		// if activated, move ship forward, limit max speed
 		if (input.isKeyDown(Input.KEY_UP)) {
-			accelerate(delta*ACCEL);
+			setAcceleration(delta*ACCEL, getObjectAngle());
 		// else, slow it down until it stops.
 		} else {
-			accelerate(-delta*FRICTION);
+			brake(delta*FRICTION);
 		}
 		// hit the brakes!!!
 		if (input.isKeyDown(Input.KEY_DOWN)) {
-			accelerate(-delta*BRAKE);
-			
+			brake(delta*BRAKE);
 		}
 		
 		clampVelocity();
 		correctMovement(input);
 		
+		//travel();
 		addX(delta*getXSpeed());
 		addY(delta*getYSpeed());
 	}
@@ -88,35 +88,29 @@ public class Player extends GameObject {
 			setVelAngle(90);
 			setSpriteAngle(90);
 		}
+		if (input.isKeyDown(Input.KEY_L)) {
+			setVelocity(1 ,90);
+		}
 	}
 	
 	/** makes sure velocity is within bounds */
 	private void clampVelocity() {
-		//calcVelocity();
 		// makes sure velocity isn't below 0 (no going backwards)
-		if (getVelocity()<0) {setVelocity(0);}
+		if (getVelMag()<0) {setVelocity(0, 0);}
 		// makes sure velocity isn't above top speed (what about boosts?)
-		if (getVelocity()>MAX_VELOCITY) {setVelocity(MAX_VELOCITY);}
-		
-		// assigns velocity to x and y axes
-		setYSpeed((float)-Math.sin((getVelocityAngle()-DEGREE_OFFSET)*Math.PI/180)*getVelocity());
-		setXSpeed((float)-Math.cos((getVelocityAngle()-DEGREE_OFFSET)*Math.PI/180)*getVelocity());
-	}
-	private void calcVelocity() {
-		setVelocity((float)Math.sqrt(Math.pow(getXSpeed(), 2) + Math.pow(getYSpeed(), 2)));
+		if (getVelMag()>MAX_VELOCITY) {setVelMag(MAX_VELOCITY);}
 	}
 	
 	private void turnShip(boolean right, int delta) {
 		turnObject(right, delta);
 		rotateSprite(right, delta);
 	}
-	private void addVectors(float mag1, float arc1, float mag2, float arc2) {
-		
-	}
-	
-	
 	
 	/* Setters */
+	// slows down the ship
+	private void brake(float m) {
+		setAcceleration(m, clamp360(getVelocityAngle()+180));
+	}
 	
 	/* Getters */
 	

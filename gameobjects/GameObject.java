@@ -69,7 +69,6 @@ public class GameObject {
 		// keeps angle within 360 at all times
 		spriteAngle = clamp360(spriteAngle);
 		sprite.setRotation(spriteAngle);
-		
 	}
 	
 	/**
@@ -80,18 +79,18 @@ public class GameObject {
 	}
 	
 	/* Helper Methods */
+	
 	// moves the object. currently blank, for abstraction reasons
 	public void move(Input input, int delta) {}
 	
 	// moves the object by its velocity
 	public void travel() {
-		velocity.addVector(accel);
 		addX(velocity.getXVec());
 		addY(velocity.getYVec());
 	}
 	
 	// clamps within 360
-	private float clamp360(float a) {
+	public float clamp360(float a) {
 		while (a<0) {a+=360;}
 		return a%360;
 	}
@@ -137,68 +136,58 @@ public class GameObject {
 	}
 
 	/* Setters */
-	public void setX(float x) {
-		position.setX(x);
-	}
-	public void setY(float y) {
-		position.setY(y);
-	}
-	public void setPos(float x, float y) {
-		position.setPos(x, y);
-	}
-	public void setPos(Position p) {
-		position.setPos(p);
-	}
-	public void addX(float x) {
-		position.addX(x);
-	}
-	public void addY(float y) {
-		position.addY(y);
-	}
-	public void setSpriteAngle(float angle) {
-		this.spriteAngle = angle;
-	}
-	public void addSpriteAngle(float angle) {
-		this.spriteAngle += angle;
-	}
-	public void setVelAngle(float angle) {
-		objectAngle=angle;
-	}
-	public void addVelAngle(float angle) {
-		objectAngle+=angle;
-	}
-	public void setVelocity(Vector v) {
-		velocity = new Vector(v);
-	}
-	public void accelerate(Vector v) {
-		velocity.addVector(v);
-	}
+	public void setX(float x) {position.setX(x);}
+	public void setY(float y) {position.setY(y);}
 	
-	public void setXSpeed(float x) {
-		velocity.setXVec(x);
-	}
-	public void setYSpeed(float y) {
-		velocity.setYVec(y);
-	}
+	public void setPos(float x, float y) {position.setPos(x, y);}
+	public void setPos(Position p) {position.setPos(p);}
 	
-	public void setSpriteRotationSpeed(float rotationSpeed) {
-		this.spriteRotationSpeed = rotationSpeed;
-	}
+	public void addX(float x) {position.addX(x);}
+	public void addY(float y) {position.addY(y);}
+	
+	public void setSpriteAngle(float angle) {this.spriteAngle = angle;}
+	public void addSpriteAngle(float angle) {this.spriteAngle += angle;}
+	
+	public void setVelAngle(float angle) {objectAngle=angle;}
+	public void addVelAngle(float angle) {objectAngle+=angle;}
+	
+	public void setVelMag(float m) {velocity.setMagnitude(m);}
+	public void addVelMag(float m) {velocity.addMagnitude(m);}
+	
+	public void setVelocity(float m, float a) {velocity.setVector(m, a);}
+	public void setVelocity(Vector v) {velocity = new Vector(v);}
+	
+	public void accelerate() {velocity.addVector(accel);}
+	//public void accelerate(Vector v) {velocity.addVector(v);}
+	public void setAcceleration(float m, float a) {accel.setVector(m, a);}
+	public void setAcceleration(Vector v) {accel.setVector(v);}
+	public void addAcceleration(float m, float a) {accel.addVector(m, a);}
+	public void addAcceleration(Vector v) {accel.addVector(v);}
+	
+	public void setXSpeed(float x) {velocity.setXVec(x);}
+	public void setYSpeed(float y) {velocity.setYVec(y);}
+	
+	public void setSpriteRotationSpeed(float rotationSpeed) {this.spriteRotationSpeed = rotationSpeed;}
 	
 	/* Getters */
-	public Position getPos() {return position;}
-	
 	public float getX() {return position.getX();}
 	public float getY() {return position.getY();}
-	
-	public float getSpriteAngle() {return spriteAngle;}
+	public Position getPos() {return position;}
 	
 	public float getXSpeed() {return velocity.getXVec();}
 	public float getYSpeed() {return velocity.getYVec();}
-	
-	public float getVelocityAngle() {return velocity.getAngle();}
-	// returns the absolute value of the directional velocity
+	public float getVelMag() {return velocity.getMagnitude();}
 	public Vector getVelocity() {return new Vector(velocity);}
+	
+	public float getXAccel() {return accel.getXVec();}
+	public float getYAccel() {return accel.getYVec();}
+	public float getAccelMag() {return accel.getMagnitude();}
+	
+	public float getSpriteAngle() {return spriteAngle;}
+	public float getObjectAngle() {return objectAngle;}
+	public float getVelocityAngle() {return velocity.getAngle();}
+	
+	
 	// (float)Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2))
 	/*
 	public float getXspeed() {
